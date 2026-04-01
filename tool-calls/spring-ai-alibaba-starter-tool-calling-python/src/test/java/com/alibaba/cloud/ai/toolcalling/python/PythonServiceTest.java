@@ -163,4 +163,21 @@ public class PythonServiceTest {
         log.info("Custom properties test result: " + response.result());
     }
 
+    @Test
+    @DisplayName("Test with custom options")
+    public void testCustomOptions() {
+        PythonProperties customProps = new PythonProperties();
+        // Use a harmless option. TerminalWidth is a valid GraalVM basic option.
+        customProps.getContext().getOptions().put("python.TerminalWidth", "80");
+
+        PythonService customService = new PythonService(customProps);
+        Request request = new Request("10 * 10");
+        Response response = customService.apply(request, null);
+
+        assertNotNull(response);
+        assertNotNull(response.result());
+        assertTrue(response.result().contains("100"), "Result should be 100, but got: " + response.result());
+        log.info("Custom options test result: " + response.result());
+    }
+
 }

@@ -29,6 +29,7 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 
+import java.util.Map;
 import java.util.function.BiFunction;
 
 /**
@@ -52,14 +53,20 @@ public class PythonService implements BiFunction<PythonService.Request, ToolCont
         this.engine = Engine.newBuilder()
                 .allowExperimentalOptions(properties.getEngine().isWarnInterpreterOnly())
                 .build();
-        this.context = Context.newBuilder("python")
+
+        Context.Builder contextBuilder = Context.newBuilder("python")
                 .engine(engine)
                 .allowAllAccess(properties.getContext().isAllowAllAccess())
                 .allowIO(properties.getContext().isAllowIO())
                 .allowNativeAccess(properties.getContext().isAllowNativeAccess())
                 .allowCreateProcess(properties.getContext().isAllowCreateProcess())
-                .allowHostAccess(properties.getContext().isAllowHostAccess())
-                .build();
+                .allowHostAccess(properties.getContext().isAllowHostAccess());
+
+        if (properties.getContext().getOptions() != null) {
+            properties.getContext().getOptions().forEach(contextBuilder::option);
+        }
+
+        this.context = contextBuilder.build();
     }
 
     /**
