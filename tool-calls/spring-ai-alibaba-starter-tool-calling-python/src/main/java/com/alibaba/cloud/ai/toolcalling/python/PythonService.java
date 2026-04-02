@@ -29,7 +29,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 
-import java.util.Map;
 import java.util.function.BiFunction;
 
 /**
@@ -62,8 +61,8 @@ public class PythonService implements BiFunction<PythonService.Request, ToolCont
                 .allowCreateProcess(properties.getContext().isAllowCreateProcess())
                 .allowHostAccess(properties.getContext().isAllowHostAccess());
 
-        if (properties.getContext().getOptions() != null) {
-            properties.getContext().getOptions().forEach(contextBuilder::option);
+        if (properties.getContext().getOptions() != null && !properties.getContext().getOptions().isEmpty()) {
+            contextBuilder.options(properties.getContext().getOptions());
         }
 
         this.context = contextBuilder.build();
@@ -98,7 +97,7 @@ public class PythonService implements BiFunction<PythonService.Request, ToolCont
     }
 
     /**
-     * 将 Polyglot Value 转换为字符串
+     * Convert a Polyglot Value to its string representation.
      */
     private String convertResultToString(Value result) {
         if (result.isNull()) {
@@ -119,7 +118,7 @@ public class PythonService implements BiFunction<PythonService.Request, ToolCont
     }
 
     /**
-     * 将数组/列表转换为字符串表示
+     * Convert an array-like value to its string representation.
      */
     private String convertArrayToString(Value result) {
         StringBuilder sb = new StringBuilder("[");
@@ -163,4 +162,3 @@ public class PythonService implements BiFunction<PythonService.Request, ToolCont
 
     }
 }
-
