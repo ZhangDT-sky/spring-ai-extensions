@@ -15,6 +15,8 @@
  */
 package com.alibaba.cloud.ai.dashscope.image;
 
+import com.alibaba.cloud.ai.dashscope.spec.DashScopeApiSpec.InvokeMode;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Arrays;
@@ -115,6 +117,16 @@ public class DashScopeImageOptions implements ImageOptions {
   @JsonProperty("enable_interleave")
   private Boolean enableInterleave;
 
+  /**
+   * Invocation mode for the API call.
+   * - AUTO: automatically choose based on model defaults (backward compatible)
+   * - SYNC: synchronous call (no async header)
+   * - ASYNC: asynchronous call (with async header, returns task_id for polling)
+   * Note: If model doesn't support sync, will auto-downgrade to async with WARN log.
+   */
+  @JsonIgnore
+  private InvokeMode invokeMode = InvokeMode.AUTO;
+
   public Boolean getPromptExtend() {
     return promptExtend;
   }
@@ -209,6 +221,14 @@ public class DashScopeImageOptions implements ImageOptions {
 
   public void setEnableInterleave(Boolean enableInterleave) {
     this.enableInterleave = enableInterleave;
+  }
+
+  public InvokeMode getInvokeMode() {
+    return invokeMode;
+  }
+
+  public void setInvokeMode(InvokeMode invokeMode) {
+    this.invokeMode = invokeMode;
   }
 
   public static Builder builder() {
@@ -331,7 +351,7 @@ public class DashScopeImageOptions implements ImageOptions {
         + this.maskImageUrl + '\'' + ", sketchImageUrl='" + this.sketchImageUrl + '\'' + ", sketchWeight="
         + this.sketchWeight + ", sketchExtraction=" + this.sketchExtraction + ", sketchColor="
         + Arrays.toString(this.sketchColor) + ", maskColor=" + Arrays.toString(this.maskColor) + ", maxImages="
-        + this.maxImages + ", enableInterleave=" + this.enableInterleave + '}';
+        + this.maxImages + ", enableInterleave=" + this.enableInterleave + ", invokeMode=" + this.invokeMode + '}';
   }
 
   public static class Builder {
@@ -576,6 +596,11 @@ public class DashScopeImageOptions implements ImageOptions {
     @Deprecated
     public Builder withEnableInterleave(Boolean enableInterleave) {
         return enableInterleave(enableInterleave);
+    }
+
+    public Builder invokeMode(InvokeMode invokeMode) {
+        this.options.invokeMode = invokeMode;
+        return this;
     }
 
     public DashScopeImageOptions build() {
